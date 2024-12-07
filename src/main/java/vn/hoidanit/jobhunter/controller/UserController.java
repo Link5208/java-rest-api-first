@@ -2,6 +2,8 @@ package vn.hoidanit.jobhunter.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,35 +23,36 @@ public class UserController {
     this.userService = userService;
   }
 
-  @PostMapping("/user")
-  public User createNewUser(@RequestBody User postManUser) {
+  @PostMapping("/users")
+  public ResponseEntity<User> createNewUser(@RequestBody User postManUser) {
 
     User newUser = this.userService.handleCreateUser(postManUser);
-    return newUser;
+    return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
   }
 
-  @DeleteMapping("/user/{id}")
-  public String deleteUser(@PathVariable("id") long id) {
+  @DeleteMapping("/users/{id}")
+  public ResponseEntity<String> deleteUser(@PathVariable("id") long id) {
     this.userService.handleDeleteUserByID(id);
-    return "Delete user";
+    return ResponseEntity.ok("Delete user");
+    // return ResponseEntity.status(HttpStatus.OK).body("Delete user");
   }
 
-  @GetMapping("/user/{id}")
-  public User getUserByID(@PathVariable("id") long id) {
+  @GetMapping("/users/{id}")
+  public ResponseEntity<User> getUserByID(@PathVariable("id") long id) {
     User user = this.userService.fetchUserByID(id);
-    return user;
+    return ResponseEntity.status(HttpStatus.OK).body(user);
   }
 
-  @GetMapping("/user")
-  public List<User> getAllUsers() {
+  @GetMapping("/users")
+  public ResponseEntity<List<User>> getAllUsers() {
     List<User> users = this.userService.fetchAllUsers();
-    return users;
+    return ResponseEntity.status(HttpStatus.OK).body(users);
   }
 
-  @PutMapping("/user")
-  public User updateUser(@RequestBody User postManUser) {
-
-    return this.userService.handleUpdateUser(postManUser);
+  @PutMapping("/users")
+  public ResponseEntity<User> updateUser(@RequestBody User postManUser) {
+    User user = this.userService.handleUpdateUser(postManUser);
+    return ResponseEntity.status(HttpStatus.OK).body(user);
   }
 
 }

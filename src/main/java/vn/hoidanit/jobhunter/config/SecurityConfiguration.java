@@ -30,6 +30,7 @@ import vn.hoidanit.jobhunter.util.SecurityUtil;
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
+
 	@Value("${hoidanit.jwt.base64-secret}")
 	private String jwtKey;
 

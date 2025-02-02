@@ -1,7 +1,5 @@
 package vn.hoidanit.jobhunter.controller;
 
-import javax.naming.NameNotFoundException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

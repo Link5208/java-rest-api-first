@@ -3,8 +3,6 @@ package vn.hoidanit.jobhunter.util.error;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.naming.NameNotFoundException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;

@@ -3,6 +3,8 @@ package vn.hoidanit.jobhunter.util.error;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.naming.NameNotFoundException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -41,6 +43,17 @@ public class GlobalException {
 
 		List<String> errors = fieldErrors.stream().map(f -> f.getDefaultMessage()).collect(Collectors.toList());
 		res.setMessage(errors.size() > 1 ? errors : errors.get(0));
+		return ResponseEntity.badRequest().body(res);
+	}
+
+	@ExceptionHandler(value = {
+			NameNotFoundException.class
+	})
+	public ResponseEntity<RestResponse<Object>> handleCompanyNameException(Exception e) {
+		RestResponse<Object> res = new RestResponse<Object>();
+		res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+		res.setError(e.getMessage());
+		res.setMessage("Name is not blank");
 		return ResponseEntity.badRequest().body(res);
 	}
 }

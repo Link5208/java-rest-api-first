@@ -24,6 +24,8 @@ public class SecurityUtil {
 	}
 
 	public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
+	@Value("${hoidanit.jwt.base64-secret}")
+	private String jwtKey;
 
 	@Value("${hoidanit.jwt.token-validity-in-seconds}")
 	private long jwtKeyExpiration;

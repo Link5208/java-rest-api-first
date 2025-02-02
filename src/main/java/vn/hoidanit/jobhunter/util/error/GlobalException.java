@@ -46,14 +46,4 @@ public class GlobalException {
 		return ResponseEntity.badRequest().body(res);
 	}
 
-	@ExceptionHandler(value = {
-			NameNotFoundException.class
-	})
-	public ResponseEntity<RestResponse<Object>> handleCompanyNameException(Exception e) {
-		RestResponse<Object> res = new RestResponse<Object>();
-		res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-		res.setError(e.getMessage());
-		res.setMessage("Name is not blank");
-		return ResponseEntity.badRequest().body(res);
-	}
 }

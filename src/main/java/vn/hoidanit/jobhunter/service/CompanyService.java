@@ -7,7 +7,7 @@ import vn.hoidanit.jobhunter.repository.CompanyRepository;
 
 @Service
 public class CompanyService {
-	private CompanyRepository companyRepository;
+	private final CompanyRepository companyRepository;
 
 	/**
 	 * @param companyRepository

@@ -38,22 +38,16 @@ public class CompanyController {
 	}
 
 	@GetMapping("/companies")
-	public ResponseEntity<List<Company>> fetchAllCompanies() {
-		return ResponseEntity.ok().body(this.companyService.fetchAllCompanies());
+	public ResponseEntity<List<Company>> getAllCompanies() {
+		List<Company> companies = this.companyService.fetchAllCompanies();
+		return ResponseEntity.ok(companies);
 	}
 
 	@PutMapping("/companies")
-	public ResponseEntity<Company> updateCompany(@RequestBody Company postmanCompany) {
-		Company updatedCompany = this.companyService.fetchCompanyByID(postmanCompany.getId());
+	public ResponseEntity<Company> updateCompany(@Valid @RequestBody Company postmanCompany) {
+		Company updatedCompany = this.companyService.handleUpdateCompany(postmanCompany);
 
-		updatedCompany.setName(postmanCompany.getName());
-		updatedCompany.setDescription(postmanCompany.getDescription());
-		updatedCompany.setAddress(postmanCompany.getAddress());
-		updatedCompany.setLogo(postmanCompany.getLogo());
-		updatedCompany.handleBeforeUpdate();
-		this.companyService.handleSaveCompany(updatedCompany);
-
-		return ResponseEntity.ok().body(updatedCompany);
+		return ResponseEntity.ok(updatedCompany);
 	}
 
 	@DeleteMapping("/companies/{id}")
@@ -62,7 +56,7 @@ public class CompanyController {
 			throw new IdInvalidException("ID is not bigger than 1500");
 		}
 		this.companyService.deleleCompanyByID(id);
-		return ResponseEntity.ok().body(null);
+		return ResponseEntity.ok(null);
 	}
 
 }

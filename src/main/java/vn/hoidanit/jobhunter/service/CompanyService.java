@@ -36,4 +36,19 @@ public class CompanyService {
 	public void deleleCompanyByID(long id) {
 		this.companyRepository.deleteById(id);
 	}
+
+	public Company handleUpdateCompany(Company postmanCompany) {
+		Company updatedCompany = fetchCompanyByID(postmanCompany.getId());
+		if (updatedCompany == null) {
+			return null;
+		}
+		updatedCompany.setName(postmanCompany.getName());
+		updatedCompany.setDescription(postmanCompany.getDescription());
+		updatedCompany.setAddress(postmanCompany.getAddress());
+		updatedCompany.setLogo(postmanCompany.getLogo());
+		updatedCompany.handleBeforeUpdate();
+		handleSaveCompany(updatedCompany);
+
+		return updatedCompany;
+	}
 }

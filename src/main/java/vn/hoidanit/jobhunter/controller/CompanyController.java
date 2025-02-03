@@ -1,14 +1,13 @@
 package vn.hoidanit.jobhunter.controller;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Company;
@@ -17,7 +16,6 @@ import vn.hoidanit.jobhunter.service.CompanyService;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,17 +42,10 @@ public class CompanyController {
 
 	@GetMapping("/companies")
 	public ResponseEntity<ResultPaginationDTO> getAllCompanies(
-			@RequestParam("current") Optional<String> currentOptional,
-			@RequestParam("pageSize") Optional<String> pageSizeOptional) {
+			@Filter Specification<Company> specification,
+			Pageable pageable) {
 
-		String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "";
-		String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "";
-		int current = Integer.parseInt(sCurrent);
-		int pageSize = Integer.parseInt(sPageSize);
-		Pageable pageable = PageRequest.of(current - 1, pageSize);
-		// List<Company> companies = this.companyService.fetchAllCompanies();
-		ResultPaginationDTO result = this.companyService.fetchAllCompanies(pageable);
-		return ResponseEntity.ok().body(result);
+		return ResponseEntity.ok().body(this.companyService.fetchAllCompanies(specification, pageable));
 	}
 
 	@PutMapping("/companies")

@@ -1,16 +1,19 @@
 package vn.hoidanit.jobhunter.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.dto.Meta;
 import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.dto.user.ResUserDTO;
 import vn.hoidanit.jobhunter.repository.UserRepository;
 
 @Service
@@ -23,19 +26,26 @@ public class UserService {
 	}
 
 	public User handleCreateUser(User user) {
-		return this.userRepository.save(user);
+		if (!this.userRepository.existsByEmail(user.getEmail()))
+			return this.userRepository.save(user);
+		else
+			return null;
 	}
 
 	public void handleDeleteUser(long id) {
+		fetchUserById(id);
 		this.userRepository.deleteById(id);
 	}
 
-	public User fetchUserById(long id) {
+	public User fetchUserById(long id) throws UsernameNotFoundException {
 		Optional<User> userOptional = this.userRepository.findById(id);
 		if (userOptional.isPresent()) {
 			return userOptional.get();
+		} else {
+			throw new UsernameNotFoundException("There is not any user having ID = " + id);
+
 		}
-		return null;
+
 	}
 
 	public List<User> fetchAllUser() {
@@ -53,21 +63,44 @@ public class UserService {
 		meta.setTotal(page.getTotalElements());
 
 		result.setMeta(meta);
-		result.setResult(page.getContent());
+		List<User> users = page.getContent();
+		List<ResUserDTO> dtos = new ArrayList<ResUserDTO>() {
+			{
+
+				for (User user : users) {
+					ResUserDTO dto = new ResUserDTO();
+					dto.setId(user.getId());
+					dto.setName(user.getName());
+					dto.setEmail(user.getEmail());
+					dto.setGender(user.getGender());
+					dto.setAddress(user.getAddress());
+					dto.setAge(user.getAge());
+					dto.setCreatedAt(user.getCreatedAt());
+					dto.setUpdatedAt(user.getUpdatedAt());
+					add(dto);
+
+				}
+			}
+
+		};
+		result.setResult(dtos);
 
 		return result;
 	}
 
 	public User handleUpdateUser(User reqUser) {
 		User currentUser = this.fetchUserById(reqUser.getId());
-		if (currentUser != null) {
-			currentUser.setEmail(reqUser.getEmail());
-			currentUser.setName(reqUser.getName());
-			currentUser.setPassword(reqUser.getPassword());
-			// update
-			currentUser = this.userRepository.save(currentUser);
-		}
+
+		currentUser.setName(reqUser.getName());
+		currentUser.setGender(reqUser.getGender());
+		currentUser.setAddress(reqUser.getAddress());
+		currentUser.setAge(reqUser.getAge());
+		currentUser.handleBeforeUpdate();
+
+		// update
+		currentUser = this.userRepository.save(currentUser);
 		return currentUser;
+
 	}
 
 	public User handleGetUserByUsername(String username) {

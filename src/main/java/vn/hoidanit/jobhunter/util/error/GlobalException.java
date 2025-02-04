@@ -12,6 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import vn.hoidanit.jobhunter.domain.RestResponse;
 
@@ -19,7 +20,8 @@ import vn.hoidanit.jobhunter.domain.RestResponse;
 public class GlobalException {
 	@ExceptionHandler(value = {
 			UsernameNotFoundException.class,
-			BadCredentialsException.class
+			BadCredentialsException.class,
+			EmailExistsAlreadyException.class
 	})
 	public ResponseEntity<RestResponse<Object>> handleIdException(Exception e) {
 		RestResponse<Object> res = new RestResponse<Object>();
@@ -42,6 +44,18 @@ public class GlobalException {
 		List<String> errors = fieldErrors.stream().map(f -> f.getDefaultMessage()).collect(Collectors.toList());
 		res.setMessage(errors.size() > 1 ? errors : errors.get(0));
 		return ResponseEntity.badRequest().body(res);
+	}
+
+	@ExceptionHandler(value = {
+			NoResourceFoundException.class,
+			NullPointerException.class })
+	public ResponseEntity<RestResponse<Object>> handleUrlException(Exception e) {
+		RestResponse<Object> response = new RestResponse<>();
+		response.setStatusCode(HttpStatus.NOT_FOUND.value());
+		response.setMessage("Wrong Url");
+		response.setError(e.getMessage());
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 	}
 
 }

@@ -8,9 +8,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import vn.hoidanit.jobhunter.util.SecurityUtil;
 import vn.hoidanit.jobhunter.util.constant.GenderEnum;
 
 @Entity
@@ -34,5 +37,18 @@ public class User {
 	private Instant updatedAt;
 	private String createdBy;
 	private String updatedBy;
+
+	@PrePersist
+	public void handleBeforeCreate() {
+		this.createdAt = Instant.now();
+		this.createdBy = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+	}
+
+	@PreUpdate
+	public void handleBeforeUpdate() {
+		this.updatedAt = Instant.now();
+		this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+
+	}
 
 }

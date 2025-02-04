@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.boot.Filter;
 
+import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.dto.user.ResCreateUserDTO;
@@ -23,7 +24,6 @@ import vn.hoidanit.jobhunter.domain.dto.user.ResUserDTO;
 import vn.hoidanit.jobhunter.domain.dto.user.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.service.UserService;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
-import vn.hoidanit.jobhunter.util.error.EmailExistsAlreadyException;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 @RestController
@@ -39,34 +39,24 @@ public class UserController {
 	}
 
 	@PostMapping("/users")
-	public ResponseEntity<ResCreateUserDTO> createNewUser(@RequestBody User postManUser)
-			throws EmailExistsAlreadyException {
+	@ApiMessage("Create a new user")
+	public ResponseEntity<ResCreateUserDTO> createNewUser(@Valid @RequestBody User postManUser)
+			throws IdInvalidException {
+
+		boolean isEmailExist = this.userService.isEmailExist(postManUser.getEmail());
+		if (isEmailExist) {
+			throw new IdInvalidException("Email " + postManUser.getEmail() + " was existed!!!");
+		}
+
 		String hashPassword = this.passwordEncoder.encode(postManUser.getPassword());
 		postManUser.setPassword(hashPassword);
 		User newUser = this.userService.handleCreateUser(postManUser);
-		if (newUser == null) {
-			throw new EmailExistsAlreadyException("Email " + postManUser.getEmail() + " was existed!!!");
-		}
 
-		ResCreateUserDTO dto = new ResCreateUserDTO();
-		dto.setId(newUser.getId());
-		dto.setName(newUser.getName());
-		dto.setEmail(newUser.getEmail());
-		dto.setGender(newUser.getGender());
-		dto.setAddress(newUser.getAddress());
-		dto.setAge(newUser.getAge());
-		dto.setCreatedAt(newUser.getCreatedAt());
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(newUser));
 	}
 
 	@DeleteMapping("/users/{id}")
-	public ResponseEntity<Void> deleteUser(@PathVariable("id") long id)
-			throws IdInvalidException {
-		if (id >= 1500) {
-			throw new IdInvalidException("Id isn't bigger than 1500");
-		}
-
+	public ResponseEntity<Void> deleteUser(@PathVariable("id") long id) {
 		this.userService.handleDeleteUser(id);
 		return ResponseEntity.ok(null);
 		// return ResponseEntity.status(HttpStatus.OK).body("ericUser");
@@ -74,25 +64,16 @@ public class UserController {
 
 	// fetch user by id
 	@GetMapping("/users/{id}")
+	@ApiMessage("Delete an user")
 	public ResponseEntity<ResUserDTO> getUserById(@PathVariable("id") long id) {
 		User fetchUser = this.userService.fetchUserById(id);
 
-		ResUserDTO dto = new ResUserDTO();
-		dto.setId(fetchUser.getId());
-		dto.setName(fetchUser.getName());
-		dto.setEmail(fetchUser.getEmail());
-		dto.setGender(fetchUser.getGender());
-		dto.setAddress(fetchUser.getAddress());
-		dto.setAge(fetchUser.getAge());
-		dto.setCreatedAt(fetchUser.getCreatedAt());
-		dto.setUpdatedAt(fetchUser.getUpdatedAt());
-
-		return ResponseEntity.status(HttpStatus.OK).body(dto);
+		return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToResUserDTO(fetchUser));
 	}
 
 	// fetch all users
 	@GetMapping("/users")
-	@ApiMessage("fetch all users")
+	@ApiMessage("Fetch all users")
 	public ResponseEntity<ResultPaginationDTO> getAllUser(
 			@Filter Specification<User> specification,
 			Pageable pageable) {
@@ -101,18 +82,11 @@ public class UserController {
 	}
 
 	@PutMapping("/users")
+	@ApiMessage("Update an user")
 	public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody User postmanUser) {
 		User user = this.userService.handleUpdateUser(postmanUser);
 
-		ResUpdateUserDTO dto = new ResUpdateUserDTO();
-		dto.setId(user.getId());
-		dto.setName(user.getName());
-		dto.setGender(user.getGender());
-		dto.setAddress(user.getAddress());
-		dto.setAge(user.getAge());
-		dto.setUpdatedAt(user.getUpdatedAt());
-
-		return ResponseEntity.ok(dto);
+		return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(user));
 	}
 
 }

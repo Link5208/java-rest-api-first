@@ -21,7 +21,7 @@ public class GlobalException {
 	@ExceptionHandler(value = {
 			UsernameNotFoundException.class,
 			BadCredentialsException.class,
-			EmailExistsAlreadyException.class
+			IdInvalidException.class
 	})
 	public ResponseEntity<RestResponse<Object>> handleIdException(Exception e) {
 		RestResponse<Object> res = new RestResponse<Object>();
@@ -46,13 +46,11 @@ public class GlobalException {
 		return ResponseEntity.badRequest().body(res);
 	}
 
-	@ExceptionHandler(value = {
-			NoResourceFoundException.class,
-			NullPointerException.class })
-	public ResponseEntity<RestResponse<Object>> handleUrlException(Exception e) {
+	@ExceptionHandler(NoResourceFoundException.class)
+	public ResponseEntity<RestResponse<Object>> handleNotFoundException(Exception e) {
 		RestResponse<Object> response = new RestResponse<>();
 		response.setStatusCode(HttpStatus.NOT_FOUND.value());
-		response.setMessage("Wrong Url");
+		response.setMessage("404 Not Found. URL may not exist...");
 		response.setError(e.getMessage());
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);

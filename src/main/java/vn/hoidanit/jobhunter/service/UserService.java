@@ -1,8 +1,8 @@
 package vn.hoidanit.jobhunter.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.dto.Meta;
 import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.dto.user.ResCreateUserDTO;
+import vn.hoidanit.jobhunter.domain.dto.user.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.dto.user.ResUserDTO;
 import vn.hoidanit.jobhunter.repository.UserRepository;
 
@@ -43,9 +45,47 @@ public class UserService {
 			return userOptional.get();
 		} else {
 			throw new UsernameNotFoundException("There is not any user having ID = " + id);
-
 		}
+	}
 
+	public boolean isEmailExist(String email) {
+		return this.userRepository.existsByEmail(email);
+	}
+
+	public ResCreateUserDTO convertToResCreateUserDTO(User user) {
+		ResCreateUserDTO dto = new ResCreateUserDTO();
+		dto.setId(user.getId());
+		dto.setName(user.getName());
+		dto.setEmail(user.getEmail());
+		dto.setGender(user.getGender());
+		dto.setAddress(user.getAddress());
+		dto.setAge(user.getAge());
+		dto.setCreatedAt(user.getCreatedAt());
+		return dto;
+	}
+
+	public ResUserDTO convertToResUserDTO(User user) {
+		ResUserDTO dto = new ResUserDTO();
+		dto.setId(user.getId());
+		dto.setName(user.getName());
+		dto.setEmail(user.getEmail());
+		dto.setGender(user.getGender());
+		dto.setAddress(user.getAddress());
+		dto.setAge(user.getAge());
+		dto.setCreatedAt(user.getCreatedAt());
+		dto.setUpdatedAt(user.getUpdatedAt());
+		return dto;
+	}
+
+	public ResUpdateUserDTO convertToResUpdateUserDTO(User user) {
+		ResUpdateUserDTO dto = new ResUpdateUserDTO();
+		dto.setId(user.getId());
+		dto.setName(user.getName());
+		dto.setGender(user.getGender());
+		dto.setAddress(user.getAddress());
+		dto.setAge(user.getAge());
+		dto.setUpdatedAt(user.getUpdatedAt());
+		return dto;
 	}
 
 	public List<User> fetchAllUser() {
@@ -63,33 +103,26 @@ public class UserService {
 		meta.setTotal(page.getTotalElements());
 
 		result.setMeta(meta);
-		List<User> users = page.getContent();
-		List<ResUserDTO> dtos = new ArrayList<ResUserDTO>() {
-			{
 
-				for (User user : users) {
-					ResUserDTO dto = new ResUserDTO();
-					dto.setId(user.getId());
-					dto.setName(user.getName());
-					dto.setEmail(user.getEmail());
-					dto.setGender(user.getGender());
-					dto.setAddress(user.getAddress());
-					dto.setAge(user.getAge());
-					dto.setCreatedAt(user.getCreatedAt());
-					dto.setUpdatedAt(user.getUpdatedAt());
-					add(dto);
+		List<ResUserDTO> dtos = page.getContent()
+				.stream().map(user -> new ResUserDTO(
+						user.getId(),
+						user.getName(),
+						user.getEmail(),
+						user.getGender(),
+						user.getAddress(),
+						user.getAge(),
+						user.getCreatedAt(),
+						user.getUpdatedAt()))
+				.collect(Collectors.toList());
 
-				}
-			}
-
-		};
 		result.setResult(dtos);
 
 		return result;
 	}
 
 	public User handleUpdateUser(User reqUser) {
-		User currentUser = this.fetchUserById(reqUser.getId());
+		User currentUser = fetchUserById(reqUser.getId());
 
 		currentUser.setName(reqUser.getName());
 		currentUser.setGender(reqUser.getGender());

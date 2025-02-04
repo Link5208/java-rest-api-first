@@ -13,15 +13,18 @@ import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.CompanyService;
+import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
+@RequestMapping("/api/v1")
 public class CompanyController {
 	private CompanyService companyService;
 
@@ -41,6 +44,7 @@ public class CompanyController {
 	}
 
 	@GetMapping("/companies")
+	@ApiMessage("Fetch companies")
 	public ResponseEntity<ResultPaginationDTO> getAllCompanies(
 			@Filter Specification<Company> specification,
 			Pageable pageable) {

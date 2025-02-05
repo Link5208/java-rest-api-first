@@ -3,7 +3,6 @@ package vn.hoidanit.jobhunter.controller;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -157,13 +156,13 @@ public class AuthController {
 
 	@PostMapping("/auth/logout")
 	@ApiMessage("Logout User")
-	public ResponseEntity<Void> postLogout(
-			@CookieValue(name = "refresh_token") String refresh_token) {
-		Jwt jwt = this.securityUtil.checkValidRefreshToken(refresh_token);
-		String email = jwt.getSubject();
-
+	public ResponseEntity<Void> Logout() throws IdInvalidException {
+		String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+		if (email.equals("")) {
+			throw new IdInvalidException("Access Token is invalid.");
+		}
 		this.userService.updateUserToken(null, email);
-		ResponseCookie responseCookie = ResponseCookie
+		ResponseCookie deleteCookie = ResponseCookie
 				.from("refresh_token", null)
 				.httpOnly(true)
 				.secure(true)
@@ -172,7 +171,7 @@ public class AuthController {
 				.build();
 		return ResponseEntity
 				.status(HttpStatus.CREATED)
-				.header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+				.header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
 				.body(null);
 	}
 

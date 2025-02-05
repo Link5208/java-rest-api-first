@@ -70,7 +70,7 @@ public class AuthController {
 		res.setAccessToken(access_token);
 		String refresh_token = this.securityUtil.createRefreshToken(loginDTO.getUsername(), res);
 
-		this.userService.updateUserToker(refresh_token, loginDTO.getUsername());
+		this.userService.updateUserToken(refresh_token, loginDTO.getUsername());
 		ResponseCookie responseCookie = ResponseCookie
 				.from("refresh_token1", refresh_token)
 				.httpOnly(true)

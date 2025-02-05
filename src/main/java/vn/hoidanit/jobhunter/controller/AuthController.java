@@ -8,6 +8,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +23,7 @@ import vn.hoidanit.jobhunter.domain.dto.ResLoginDTO;
 import vn.hoidanit.jobhunter.service.UserService;
 import vn.hoidanit.jobhunter.util.SecurityUtil;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -72,7 +75,7 @@ public class AuthController {
 
 		this.userService.updateUserToken(refresh_token, loginDTO.getUsername());
 		ResponseCookie responseCookie = ResponseCookie
-				.from("refresh_token1", refresh_token)
+				.from("refresh_token", refresh_token)
 				.httpOnly(true)
 				.secure(true)
 				.path("/")
@@ -101,6 +104,15 @@ public class AuthController {
 			userLogin.setName(currentUserDB.getName());
 		}
 		return ResponseEntity.ok().body(userLogin);
+	}
+
+	@GetMapping("/auth/refresh")
+	@ApiMessage("Get user by refresh token")
+	public ResponseEntity<String> getRefreshToken(
+			@CookieValue(name = "refresh_token") String refresh_token) {
+		Jwt decodedToken = this.securityUtil.checkValidRefreshToken(refresh_token);
+		String email = decodedToken.getSubject();
+		return ResponseEntity.ok().body(email);
 	}
 
 }

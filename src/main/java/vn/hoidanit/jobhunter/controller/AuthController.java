@@ -2,6 +2,8 @@ package vn.hoidanit.jobhunter.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -151,6 +153,27 @@ public class AuthController {
 				.header(HttpHeaders.SET_COOKIE, responseCookie.toString())
 				.body(res);
 
+	}
+
+	@PostMapping("/auth/logout")
+	@ApiMessage("Logout User")
+	public ResponseEntity<Void> postLogout(
+			@CookieValue(name = "refresh_token") String refresh_token) {
+		Jwt jwt = this.securityUtil.checkValidRefreshToken(refresh_token);
+		String email = jwt.getSubject();
+
+		this.userService.updateUserToken(null, email);
+		ResponseCookie responseCookie = ResponseCookie
+				.from("refresh_token", null)
+				.httpOnly(true)
+				.secure(true)
+				.path("/")
+				.maxAge(0)
+				.build();
+		return ResponseEntity
+				.status(HttpStatus.CREATED)
+				.header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+				.body(null);
 	}
 
 }

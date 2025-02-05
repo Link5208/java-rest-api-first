@@ -128,7 +128,6 @@ public class UserService {
 		currentUser.setGender(reqUser.getGender());
 		currentUser.setAddress(reqUser.getAddress());
 		currentUser.setAge(reqUser.getAge());
-		currentUser.handleBeforeUpdate();
 
 		// update
 		currentUser = this.userRepository.save(currentUser);
@@ -138,5 +137,13 @@ public class UserService {
 
 	public User handleGetUserByUsername(String username) {
 		return this.userRepository.findByEmail(username);
+	}
+
+	public void updateUserToker(String token, String email) {
+		User currentUser = this.handleGetUserByUsername(email);
+		if (currentUser != null) {
+			currentUser.setRefreshToken(token);
+			this.userRepository.save(currentUser);
+		}
 	}
 }

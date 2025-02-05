@@ -67,7 +67,7 @@ public class CompanyService {
 		updatedCompany.setDescription(postmanCompany.getDescription());
 		updatedCompany.setAddress(postmanCompany.getAddress());
 		updatedCompany.setLogo(postmanCompany.getLogo());
-		updatedCompany.handleBeforeUpdate();
+
 		handleSaveCompany(updatedCompany);
 
 		return updatedCompany;

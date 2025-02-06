@@ -11,11 +11,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.dto.Meta;
-import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
-import vn.hoidanit.jobhunter.domain.dto.user.ResCreateUserDTO;
-import vn.hoidanit.jobhunter.domain.dto.user.ResUpdateUserDTO;
-import vn.hoidanit.jobhunter.domain.dto.user.ResUserDTO;
+import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
+import vn.hoidanit.jobhunter.domain.response.ResUpdateUserDTO;
+import vn.hoidanit.jobhunter.domain.response.ResUserDTO;
+import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.repository.UserRepository;
 
 @Service
@@ -95,7 +94,7 @@ public class UserService {
 	public ResultPaginationDTO fetchAllUser(Specification<User> specification, Pageable pageable) {
 		Page<User> page = this.userRepository.findAll(specification, pageable);
 		ResultPaginationDTO result = new ResultPaginationDTO();
-		Meta meta = new Meta();
+		ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 
 		meta.setPage(pageable.getPageNumber() + 1);
 		meta.setPageSize(pageable.getPageSize());

@@ -56,18 +56,12 @@ public class UserController {
 			throw new IdInvalidException("Email " + postManUser.getEmail() + " was not existed!!!");
 		}
 
-		Company company = this.companyService.fetchCompanyByID(postManUser.getCompany().getId());
-		if (company == null) {
-			throw new IdInvalidException("Company with ID = " + postManUser.getCompany().getId() + " was not existed!!!");
-
-		}
-
 		String hashPassword = this.passwordEncoder.encode(postManUser.getPassword());
 		postManUser.setPassword(hashPassword);
 
 		User newUser = this.userService.handleCreateUser(postManUser);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(newUser, company));
+		return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(newUser));
 	}
 
 	@DeleteMapping("/users/{id}")
@@ -92,7 +86,8 @@ public class UserController {
 	public ResponseEntity<ResultPaginationDTO> getAllUser(
 			@Filter Specification<User> specification,
 			Pageable pageable) {
-		return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUser(specification, pageable));
+		return ResponseEntity.status(HttpStatus.OK).body(
+				this.userService.fetchAllUser(specification, pageable));
 
 	}
 
@@ -106,7 +101,7 @@ public class UserController {
 			throw new IdInvalidException("Company with ID = " + postmanUser.getCompany().getId() + " was not existed!!!");
 
 		}
-		return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(user, company));
+		return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(user));
 	}
 
 }

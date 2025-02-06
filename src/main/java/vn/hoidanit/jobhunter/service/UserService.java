@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.response.ResCompanyForUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUserDTO;
@@ -31,22 +30,19 @@ public class UserService {
 	}
 
 	public User handleCreateUser(User user) {
-		if (!this.userRepository.existsByEmail(user.getEmail()))
+		if (!this.userRepository.existsByEmail(user.getEmail())) {
+			if (user.getCompany() != null) {
+				Company company = this.companyService.fetchCompanyByID(user.getCompany().getId());
+				user.setCompany(company);
+			}
 			return this.userRepository.save(user);
-		else
-			return null;
+		}
+		return null;
 	}
 
 	public void handleDeleteUser(long id) {
 		fetchUserById(id);
 		this.userRepository.deleteById(id);
-	}
-
-	public void handleDeleteUserByCompanyID(long id) {
-		Company company = this.companyService.fetchCompanyByID(id);
-		List<User> users = this.userRepository.findByCompany(company);
-		this.userRepository.deleteAllByCompany(company);
-		
 	}
 
 	public User fetchUserById(long id) throws UsernameNotFoundException {
@@ -62,8 +58,9 @@ public class UserService {
 		return this.userRepository.existsByEmail(email);
 	}
 
-	public ResCreateUserDTO convertToResCreateUserDTO(User user, Company company) {
+	public ResCreateUserDTO convertToResCreateUserDTO(User user) {
 		ResCreateUserDTO dto = new ResCreateUserDTO();
+		ResCreateUserDTO.CompanyUser company = new ResCreateUserDTO.CompanyUser();
 		dto.setId(user.getId());
 		dto.setName(user.getName());
 		dto.setEmail(user.getEmail());
@@ -72,13 +69,27 @@ public class UserService {
 		dto.setAge(user.getAge());
 		dto.setCreatedAt(user.getCreatedAt());
 
-		dto.setCompany(this.companyService.convertToResCompanyDTO(company));
+		if (user.getCompany() != null) {
+			company.setId(user.getCompany().getId());
+			company.setName(user.getCompany().getName());
+			dto.setCompany(company);
+
+		}
 
 		return dto;
 	}
 
 	public ResUserDTO convertToResUserDTO(User user) {
 		ResUserDTO dto = new ResUserDTO();
+		ResUserDTO.CompanyUser company = new ResUserDTO.CompanyUser();
+
+		if (user.getCompany() != null) {
+			company.setId(user.getCompany().getId());
+			company.setName(user.getCompany().getName());
+			dto.setCompany(company);
+
+		}
+
 		dto.setId(user.getId());
 		dto.setName(user.getName());
 		dto.setEmail(user.getEmail());
@@ -87,20 +98,28 @@ public class UserService {
 		dto.setAge(user.getAge());
 		dto.setCreatedAt(user.getCreatedAt());
 		dto.setUpdatedAt(user.getUpdatedAt());
-		dto.setCompany(new ResCompanyForUserDTO(user.getCompany().getId(),
-				user.getCompany().getName()));
+
 		return dto;
 	}
 
-	public ResUpdateUserDTO convertToResUpdateUserDTO(User user, Company company) {
+	public ResUpdateUserDTO convertToResUpdateUserDTO(User user) {
 		ResUpdateUserDTO dto = new ResUpdateUserDTO();
+		ResUpdateUserDTO.CompanyUser company = new ResUpdateUserDTO.CompanyUser();
+
+		if (user.getCompany() != null) {
+			company.setId(user.getCompany().getId());
+			company.setName(user.getCompany().getName());
+			dto.setCompany(company);
+
+		}
+
 		dto.setId(user.getId());
 		dto.setName(user.getName());
 		dto.setGender(user.getGender());
 		dto.setAddress(user.getAddress());
 		dto.setAge(user.getAge());
 		dto.setUpdatedAt(user.getUpdatedAt());
-		dto.setCompany(this.companyService.convertToResCompanyDTO(company));
+
 		return dto;
 	}
 
@@ -126,7 +145,9 @@ public class UserService {
 						user.getAge(),
 						user.getCreatedAt(),
 						user.getUpdatedAt(),
-						this.companyService.convertToResCompanyDTO(user.getCompany())))
+						new ResUserDTO.CompanyUser(
+								user.getCompany() != null ? user.getCompany().getId() : 0,
+								user.getCompany() != null ? user.getCompany().getName() : null)))
 				.collect(Collectors.toList());
 
 		result.setResult(dtos);
@@ -141,6 +162,11 @@ public class UserService {
 		currentUser.setAddress(reqUser.getAddress());
 		currentUser.setAge(reqUser.getAge());
 		currentUser.setCompany(reqUser.getCompany());
+
+		if (reqUser.getCompany() != null) {
+			Company company = this.companyService.fetchCompanyByID(reqUser.getCompany().getId());
+			reqUser.setCompany(company);
+		}
 
 		// update
 		currentUser = this.userRepository.save(currentUser);

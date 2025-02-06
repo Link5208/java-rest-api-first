@@ -10,7 +10,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.User;
+import vn.hoidanit.jobhunter.domain.response.ResCompanyForUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUserDTO;
@@ -21,9 +23,11 @@ import vn.hoidanit.jobhunter.repository.UserRepository;
 public class UserService {
 
 	private final UserRepository userRepository;
+	private final CompanyService companyService;
 
-	public UserService(UserRepository userRepository) {
+	public UserService(UserRepository userRepository, CompanyService companyService) {
 		this.userRepository = userRepository;
+		this.companyService = companyService;
 	}
 
 	public User handleCreateUser(User user) {
@@ -36,6 +40,13 @@ public class UserService {
 	public void handleDeleteUser(long id) {
 		fetchUserById(id);
 		this.userRepository.deleteById(id);
+	}
+
+	public void handleDeleteUserByCompanyID(long id) {
+		Company company = this.companyService.fetchCompanyByID(id);
+		List<User> users = this.userRepository.findByCompany(company);
+		this.userRepository.deleteAllByCompany(company);
+		
 	}
 
 	public User fetchUserById(long id) throws UsernameNotFoundException {
@@ -51,7 +62,7 @@ public class UserService {
 		return this.userRepository.existsByEmail(email);
 	}
 
-	public ResCreateUserDTO convertToResCreateUserDTO(User user) {
+	public ResCreateUserDTO convertToResCreateUserDTO(User user, Company company) {
 		ResCreateUserDTO dto = new ResCreateUserDTO();
 		dto.setId(user.getId());
 		dto.setName(user.getName());
@@ -60,6 +71,9 @@ public class UserService {
 		dto.setAddress(user.getAddress());
 		dto.setAge(user.getAge());
 		dto.setCreatedAt(user.getCreatedAt());
+
+		dto.setCompany(this.companyService.convertToResCompanyDTO(company));
+
 		return dto;
 	}
 
@@ -73,10 +87,12 @@ public class UserService {
 		dto.setAge(user.getAge());
 		dto.setCreatedAt(user.getCreatedAt());
 		dto.setUpdatedAt(user.getUpdatedAt());
+		dto.setCompany(new ResCompanyForUserDTO(user.getCompany().getId(),
+				user.getCompany().getName()));
 		return dto;
 	}
 
-	public ResUpdateUserDTO convertToResUpdateUserDTO(User user) {
+	public ResUpdateUserDTO convertToResUpdateUserDTO(User user, Company company) {
 		ResUpdateUserDTO dto = new ResUpdateUserDTO();
 		dto.setId(user.getId());
 		dto.setName(user.getName());
@@ -84,11 +100,8 @@ public class UserService {
 		dto.setAddress(user.getAddress());
 		dto.setAge(user.getAge());
 		dto.setUpdatedAt(user.getUpdatedAt());
+		dto.setCompany(this.companyService.convertToResCompanyDTO(company));
 		return dto;
-	}
-
-	public List<User> fetchAllUser() {
-		return this.userRepository.findAll();
 	}
 
 	public ResultPaginationDTO fetchAllUser(Specification<User> specification, Pageable pageable) {
@@ -112,7 +125,8 @@ public class UserService {
 						user.getAddress(),
 						user.getAge(),
 						user.getCreatedAt(),
-						user.getUpdatedAt()))
+						user.getUpdatedAt(),
+						this.companyService.convertToResCompanyDTO(user.getCompany())))
 				.collect(Collectors.toList());
 
 		result.setResult(dtos);
@@ -122,11 +136,11 @@ public class UserService {
 
 	public User handleUpdateUser(User reqUser) {
 		User currentUser = fetchUserById(reqUser.getId());
-
 		currentUser.setName(reqUser.getName());
 		currentUser.setGender(reqUser.getGender());
 		currentUser.setAddress(reqUser.getAddress());
 		currentUser.setAge(reqUser.getAge());
+		currentUser.setCompany(reqUser.getCompany());
 
 		// update
 		currentUser = this.userRepository.save(currentUser);

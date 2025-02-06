@@ -16,4 +16,6 @@ public class ResCreateUserDTO {
 	private GenderEnum gender;
 	private String address;
 	private Instant createdAt;
+	private ResCompanyForUserDTO company;
+
 }

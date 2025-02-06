@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
+import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.service.CompanyService;
 import vn.hoidanit.jobhunter.service.UserService;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
@@ -30,12 +32,18 @@ import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 @RequestMapping("/api/v1")
 public class UserController {
 	private final UserService userService;
-
 	private final PasswordEncoder passwordEncoder;
+	private final CompanyService companyService;
 
-	public UserController(UserService userService, PasswordEncoder passwordEncoder) {
+	/**
+	 * @param userService
+	 * @param passwordEncoder
+	 * @param companyService
+	 */
+	public UserController(UserService userService, PasswordEncoder passwordEncoder, CompanyService companyService) {
 		this.userService = userService;
 		this.passwordEncoder = passwordEncoder;
+		this.companyService = companyService;
 	}
 
 	@PostMapping("/users")
@@ -45,14 +53,21 @@ public class UserController {
 
 		boolean isEmailExist = this.userService.isEmailExist(postManUser.getEmail());
 		if (isEmailExist) {
-			throw new IdInvalidException("Email " + postManUser.getEmail() + " was existed!!!");
+			throw new IdInvalidException("Email " + postManUser.getEmail() + " was not existed!!!");
+		}
+
+		Company company = this.companyService.fetchCompanyByID(postManUser.getCompany().getId());
+		if (company == null) {
+			throw new IdInvalidException("Company with ID = " + postManUser.getCompany().getId() + " was not existed!!!");
+
 		}
 
 		String hashPassword = this.passwordEncoder.encode(postManUser.getPassword());
 		postManUser.setPassword(hashPassword);
+
 		User newUser = this.userService.handleCreateUser(postManUser);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(newUser));
+		return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(newUser, company));
 	}
 
 	@DeleteMapping("/users/{id}")
@@ -65,7 +80,7 @@ public class UserController {
 	// fetch user by id
 	@GetMapping("/users/{id}")
 	@ApiMessage("Delete an user")
-	public ResponseEntity<ResUserDTO> getUserById(@PathVariable("id") long id) {
+	public ResponseEntity<ResUserDTO> getUserById(@PathVariable("id") long id) throws IdInvalidException {
 		User fetchUser = this.userService.fetchUserById(id);
 
 		return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToResUserDTO(fetchUser));
@@ -83,10 +98,15 @@ public class UserController {
 
 	@PutMapping("/users")
 	@ApiMessage("Update an user")
-	public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody User postmanUser) {
+	public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody User postmanUser)
+			throws IdInvalidException {
 		User user = this.userService.handleUpdateUser(postmanUser);
+		Company company = this.companyService.fetchCompanyByID(postmanUser.getCompany().getId());
+		if (company == null) {
+			throw new IdInvalidException("Company with ID = " + postmanUser.getCompany().getId() + " was not existed!!!");
 
-		return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(user));
+		}
+		return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(user, company));
 	}
 
 }

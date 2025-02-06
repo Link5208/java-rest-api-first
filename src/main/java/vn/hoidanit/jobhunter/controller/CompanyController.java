@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.CompanyService;
+import vn.hoidanit.jobhunter.service.UserService;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
@@ -27,12 +28,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RequestMapping("/api/v1")
 public class CompanyController {
 	private CompanyService companyService;
+	private UserService userService;
 
 	/**
 	 * @param companyService
+	 * @param userService
 	 */
-	public CompanyController(CompanyService companyService) {
+	public CompanyController(CompanyService companyService, UserService userService) {
 		this.companyService = companyService;
+		this.userService = userService;
 	}
 
 	@PostMapping("/companies")
@@ -64,6 +68,8 @@ public class CompanyController {
 		if (id >= 1500) {
 			throw new IdInvalidException("ID is not bigger than 1500");
 		}
+		this.userService.handleDeleteUserByCompanyID(id);
+
 		this.companyService.deleleCompanyByID(id);
 		return ResponseEntity.ok(null);
 	}

@@ -6,21 +6,20 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.hoidanit.jobhunter.util.constant.GenderEnum;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResUserDTO {
+public class ResCompanyDTO {
+
 	private long id;
 	private String name;
-	private String email;
-	private GenderEnum gender;
+	private String description;
 	private String address;
-	private int age;
+	private String logo;
 	private Instant createdAt;
 	private Instant updatedAt;
-	private ResCompanyForUserDTO company;
-
+	private String createdBy;
+	private String updatedBy;
 }

@@ -36,7 +36,6 @@ public class SkillService {
 		ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 
 		meta.setPage(page.getNumber() + 1);
-		;
 		meta.setPageSize(page.getSize());
 		meta.setPages(page.getTotalPages());
 		meta.setTotal(page.getTotalElements());
@@ -44,5 +43,12 @@ public class SkillService {
 		result.setMeta(meta);
 		result.setResult(page.getContent());
 		return result;
+	}
+
+	public void handleDeleteSkill(long id) {
+
+		Skill skill = fetchSkillByID(id);
+		skill.getJobs().forEach(job -> job.getSkills().remove(skill));
+		this.skillRepository.delete(skill);
 	}
 }

@@ -1,8 +1,8 @@
 package vn.hoidanit.jobhunter.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 import vn.hoidanit.jobhunter.domain.Job;
 import vn.hoidanit.jobhunter.domain.Skill;
-import vn.hoidanit.jobhunter.domain.response.ResCreateJobDTO;
-import vn.hoidanit.jobhunter.domain.response.ResUpdateJobDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.response.job.ResCreateJobDTO;
+import vn.hoidanit.jobhunter.domain.response.job.ResUpdateJobDTO;
 import vn.hoidanit.jobhunter.repository.JobRepository;
 import vn.hoidanit.jobhunter.repository.SkillRepository;
 
@@ -26,12 +26,14 @@ public class JobService {
 
 	public ResCreateJobDTO handleCreateNewJob(Job postmanJob) {
 
-		List<Long> ids = new ArrayList<>();
-		for (Skill skill : postmanJob.getSkills()) {
-			ids.add(skill.getId());
+		if (postmanJob.getSkills() != null) {
+			List<Long> ids = postmanJob.getSkills()
+					.stream().map(x -> x.getId())
+					.collect(Collectors.toList());
+			List<Skill> skills = this.skillRepository.findByIdIn(ids);
+			postmanJob.setSkills(skills);
 		}
-		List<Skill> skills = this.skillRepository.findByIdIn(ids);
-		postmanJob.setSkills(skills);
+
 		Job job = this.jobRepository.save(postmanJob);
 		ResCreateJobDTO createJobDTO = convertToResCreateJobDTO(job);
 
@@ -54,10 +56,8 @@ public class JobService {
 		updatedJob.setEndDate(postmanJob.getEndDate());
 		updatedJob.setActive(postmanJob.isActive());
 
-		List<Long> ids = new ArrayList<>();
-		for (Skill skill : postmanJob.getSkills()) {
-			ids.add(skill.getId());
-		}
+		List<Long> ids = postmanJob.getSkills()
+				.stream().map(skill -> skill.getId()).toList();
 		List<Skill> skills = this.skillRepository.findByIdIn(ids);
 		updatedJob.setSkills(skills);
 		this.jobRepository.save(updatedJob);
@@ -75,15 +75,16 @@ public class JobService {
 		jobDTO.setStartDate(job.getStartDate());
 		jobDTO.setEndDate(job.getEndDate());
 		jobDTO.setActive(job.isActive());
-
-		List<String> jobSkills = new ArrayList<>();
-		for (Skill skill : job.getSkills()) {
-			jobSkills.add(skill.getName());
-		}
-		jobDTO.setSkills(jobSkills);
 		jobDTO.setCreatedAt(job.getCreatedAt());
 		jobDTO.setCreatedBy(job.getCreatedBy());
 		jobDTO.setId(job.getId());
+
+		if (job.getSkills() != null) {
+			List<String> jobSkills = job.getSkills()
+					.stream().map(skill -> skill.getName())
+					.collect(Collectors.toList());
+			jobDTO.setSkills(jobSkills);
+		}
 		return jobDTO;
 	}
 
@@ -98,20 +99,23 @@ public class JobService {
 		jobDTO.setStartDate(job.getStartDate());
 		jobDTO.setEndDate(job.getEndDate());
 		jobDTO.setActive(job.isActive());
-
-		List<String> jobSkills = new ArrayList<>();
-		for (Skill skill : job.getSkills()) {
-			jobSkills.add(skill.getName());
-		}
-		jobDTO.setSkills(jobSkills);
 		jobDTO.setUpdatedAt(job.getUpdatedAt());
 		jobDTO.setUpdatedBy(job.getUpdatedBy());
 		jobDTO.setId(job.getId());
+
+		List<String> jobSkills = job.getSkills()
+				.stream().map(skill -> skill.getName()).toList();
+
+		jobDTO.setSkills(jobSkills);
 		return jobDTO;
 	}
 
 	public void handleDeleteJob(long id) {
 		this.jobRepository.deleteById(id);
+	}
+
+	public boolean isJobExistedById(long id) {
+		return this.jobRepository.existsById(id);
 	}
 
 	public Job handleFetchJobByID(long id) {

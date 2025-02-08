@@ -20,8 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @AllArgsConstructor
@@ -59,12 +60,25 @@ public class SkillController {
 	}
 
 	@GetMapping("/skills")
+	@ApiMessage("Fetch all skills")
 	public ResponseEntity<ResultPaginationDTO> getAllSkills(
 			@Filter Specification<Skill> specification,
 			Pageable pageable) {
 
 		ResultPaginationDTO dto = this.skillService.handleFetchAllSkills(specification, pageable);
 		return ResponseEntity.ok(dto);
+	}
+
+	@DeleteMapping("/skills/{id}")
+	@ApiMessage("Delete a skill")
+	public ResponseEntity<Void> deleteSkill(@PathVariable("id") long id)
+			throws IdInvalidException {
+		Skill skill = this.skillService.fetchSkillByID(id);
+		if (skill == null) {
+			throw new IdInvalidException("Skill with ID = " + id + " does not exist!");
+		}
+		this.skillService.handleDeleteSkill(id);
+		return ResponseEntity.ok(null);
 	}
 
 }

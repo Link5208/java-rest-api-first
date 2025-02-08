@@ -53,7 +53,7 @@ public class UserController {
 
 		boolean isEmailExist = this.userService.isEmailExist(postManUser.getEmail());
 		if (isEmailExist) {
-			throw new IdInvalidException("Email " + postManUser.getEmail() + " was not existed!!!");
+			throw new IdInvalidException("Email " + postManUser.getEmail() + " existed!!!");
 		}
 
 		String hashPassword = this.passwordEncoder.encode(postManUser.getPassword());
@@ -98,7 +98,7 @@ public class UserController {
 		User user = this.userService.handleUpdateUser(postmanUser);
 		Company company = this.companyService.fetchCompanyByID(postmanUser.getCompany().getId());
 		if (company == null) {
-			throw new IdInvalidException("Company with ID = " + postmanUser.getCompany().getId() + " was not existed!!!");
+			throw new IdInvalidException("Company with ID = " + postmanUser.getCompany().getId() + " does not exist!!!");
 
 		}
 		return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(user));

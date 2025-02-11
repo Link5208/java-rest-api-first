@@ -83,6 +83,7 @@ public class ResumeController {
 	}
 
 	@GetMapping("/resumes/{id}")
+	@ApiMessage("Fetch a resume by Id")
 	public ResponseEntity<ResResumeDTO> fetchResumeById(@PathVariable("id") long id) throws IdInvalidException {
 		Resume resume = this.resumeService.fetchResumeByID(id);
 		if (resume == null) {
@@ -93,6 +94,7 @@ public class ResumeController {
 	}
 
 	@GetMapping("/resumes")
+	@ApiMessage("Fetch all resumes")
 	public ResponseEntity<ResultPaginationDTO> fetchAllResumes(
 			@Filter Specification<Resume> specification,
 			Pageable pageable) {

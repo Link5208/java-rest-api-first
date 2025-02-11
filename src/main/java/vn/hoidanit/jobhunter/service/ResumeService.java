@@ -1,10 +1,9 @@
 package vn.hoidanit.jobhunter.service;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -62,9 +61,7 @@ public class ResumeService {
 	}
 
 	public ResultPaginationDTO handleFetchAllResumes(Specification<Resume> specification, Pageable pageable) {
-		Page<ResResumeDTO> page = new PageImpl<>(
-				this.resumeRepository.findAll(specification, pageable).stream().map(resume -> convertToResResumeDTO(resume))
-						.toList());
+		Page<Resume> page = this.resumeRepository.findAll(specification, pageable);
 		ResultPaginationDTO dto = new ResultPaginationDTO();
 		ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 
@@ -74,7 +71,9 @@ public class ResumeService {
 		meta.setTotal(page.getTotalElements());
 
 		dto.setMeta(meta);
-		dto.setResult(page.getContent());
+		List<ResResumeDTO> list = page.getContent().stream().map(resume -> convertToResResumeDTO(resume)).toList();
+
+		dto.setResult(list);
 		return dto;
 	}
 }

@@ -56,6 +56,7 @@ public class ResumeService {
 				resume.getUpdatedAt(),
 				resume.getCreatedBy(),
 				resume.getUpdatedBy(),
+				resume.getJob() != null ? resume.getJob().getCompany().getName() : null,
 				new ResResumeDTO.ResumeUser(resume.getUser().getId(), resume.getUser().getName()),
 				new ResResumeDTO.ResumeJob(resume.getJob().getId(), resume.getJob().getName()));
 	}

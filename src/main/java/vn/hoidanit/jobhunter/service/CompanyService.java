@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.User;
+import vn.hoidanit.jobhunter.domain.response.ResCompanyDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.repository.CompanyRepository;
 import vn.hoidanit.jobhunter.repository.UserRepository;
@@ -81,6 +82,19 @@ public class CompanyService {
 		handleSaveCompany(updatedCompany);
 
 		return updatedCompany;
+	}
+
+	public ResCompanyDTO convertToResCompanyDTO(Company company) {
+		return new ResCompanyDTO(
+				company.getId(),
+				company.getName(),
+				company.getDescription(),
+				company.getAddress(),
+				company.getLogo(),
+				company.getCreatedAt(),
+				company.getUpdatedAt(),
+				company.getCreatedBy(),
+				company.getUpdatedBy());
 	}
 
 }

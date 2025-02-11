@@ -10,11 +10,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
+import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.Job;
 import vn.hoidanit.jobhunter.domain.Skill;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.response.job.ResCreateJobDTO;
 import vn.hoidanit.jobhunter.domain.response.job.ResUpdateJobDTO;
+import vn.hoidanit.jobhunter.repository.CompanyRepository;
 import vn.hoidanit.jobhunter.repository.JobRepository;
 import vn.hoidanit.jobhunter.repository.SkillRepository;
 
@@ -23,6 +25,7 @@ import vn.hoidanit.jobhunter.repository.SkillRepository;
 public class JobService {
 	private final JobRepository jobRepository;
 	private final SkillRepository skillRepository;
+	private final CompanyRepository companyRepository;
 
 	public ResCreateJobDTO handleCreateNewJob(Job postmanJob) {
 
@@ -32,6 +35,13 @@ public class JobService {
 					.collect(Collectors.toList());
 			List<Skill> skills = this.skillRepository.findByIdIn(ids);
 			postmanJob.setSkills(skills);
+		}
+
+		if (postmanJob.getCompany() != null) {
+			Optional<Company> optional = this.companyRepository.findById(postmanJob.getCompany().getId());
+			if (optional.isPresent()) {
+				postmanJob.setCompany(optional.get());
+			}
 		}
 
 		Job job = this.jobRepository.save(postmanJob);
@@ -46,6 +56,12 @@ public class JobService {
 			return null;
 		}
 		Job updatedJob = jobOptional.get();
+		if (postmanJob.getCompany() != null) {
+			Optional<Company> optional = this.companyRepository.findById(postmanJob.getCompany().getId());
+			if (optional.isPresent()) {
+				updatedJob.setCompany(postmanJob.getCompany());
+			}
+		}
 		updatedJob.setName(postmanJob.getName());
 		updatedJob.setLocation(postmanJob.getLocation());
 		updatedJob.setSalary(postmanJob.getSalary());
@@ -56,10 +72,12 @@ public class JobService {
 		updatedJob.setEndDate(postmanJob.getEndDate());
 		updatedJob.setActive(postmanJob.isActive());
 
-		List<Long> ids = postmanJob.getSkills()
-				.stream().map(skill -> skill.getId()).toList();
-		List<Skill> skills = this.skillRepository.findByIdIn(ids);
-		updatedJob.setSkills(skills);
+		if (postmanJob.getSkills() != null) {
+			List<Long> ids = postmanJob.getSkills()
+					.stream().map(skill -> skill.getId()).toList();
+			List<Skill> skills = this.skillRepository.findByIdIn(ids);
+			updatedJob.setSkills(skills);
+		}
 		this.jobRepository.save(updatedJob);
 		return this.converToResUpdateJobDTO(updatedJob);
 	}

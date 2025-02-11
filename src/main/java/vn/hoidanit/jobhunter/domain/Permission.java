@@ -20,39 +20,46 @@ import lombok.Setter;
 import vn.hoidanit.jobhunter.util.SecurityUtil;
 
 @Entity
-@Table(name = "skills")
+@Table(name = "permissions")
 @Getter
 @Setter
-public class Skill {
+public class Permission {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@NotBlank(message = "Name mustn't blank")
+	@NotBlank(message = "Name must not blank!")
 	private String name;
+
+	@NotBlank(message = "API Path must not blank!")
+	private String apiPath;
+
+	@NotBlank(message = "Method must not blank!")
+	private String method;
+
+	@NotBlank(message = "Module must not blank!")
+	private String module;
+
 	private Instant createdAt;
 	private Instant updatedAt;
 	private String createdBy;
 	private String updatedBy;
 
-	@ManyToMany(mappedBy = "skills", fetch = FetchType.LAZY)
+	@ManyToMany(mappedBy = "permissions", fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<Job> jobs;
+	private List<Role> roles;
 
 	@PrePersist
 	public void handleBeforeCreate() {
-		this.createdBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
-				? SecurityUtil.getCurrentUserLogin().get()
-				: "";
 		this.createdAt = Instant.now();
+		this.createdBy = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
 	}
 
 	@PreUpdate
 	public void handleBeforeUpdate() {
-		this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
-				? SecurityUtil.getCurrentUserLogin().get()
-				: "";
 		this.updatedAt = Instant.now();
+		this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+
 	}
 }

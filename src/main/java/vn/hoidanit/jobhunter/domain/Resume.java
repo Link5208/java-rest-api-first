@@ -29,10 +29,10 @@ public class Resume {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@NotBlank(message = "Email must not be blank!")
+	@NotBlank(message = "Email must not blank!")
 	private String email;
 
-	@NotBlank(message = "URL must not be blank (Upload CV unsuccessfullly)!")
+	@NotBlank(message = "URL must not blank (Upload CV unsuccessfullly)!")
 	private String url;
 
 	@Enumerated(EnumType.STRING)

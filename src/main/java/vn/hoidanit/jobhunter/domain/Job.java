@@ -38,7 +38,7 @@ public class Job {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@NotBlank(message = "Name must not be blank")
+	@NotBlank(message = "Name must not blank")
 	private String name;
 	private String location;
 	private double salary;

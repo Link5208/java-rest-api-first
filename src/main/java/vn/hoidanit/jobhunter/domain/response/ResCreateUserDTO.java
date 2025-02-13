@@ -17,6 +17,7 @@ public class ResCreateUserDTO {
 	private String address;
 	private Instant createdAt;
 	private CompanyUser company;
+	private RoleUser role;
 
 	@Getter
 	@Setter
@@ -25,4 +26,10 @@ public class ResCreateUserDTO {
 		private String name;
 	}
 
+	@Getter
+	@Setter
+	public static class RoleUser {
+		private long id;
+		private String name;
+	}
 }

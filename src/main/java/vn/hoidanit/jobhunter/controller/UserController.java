@@ -64,15 +64,8 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(newUser));
 	}
 
-	@DeleteMapping("/users/{id}")
-	public ResponseEntity<Void> deleteUser(@PathVariable("id") long id) {
-		this.userService.handleDeleteUser(id);
-		return ResponseEntity.ok(null);
-		// return ResponseEntity.status(HttpStatus.OK).body("ericUser");
-	}
-
 	// fetch user by id
-	@GetMapping("/users/{id}")
+	@DeleteMapping("/users/{id}")
 	@ApiMessage("Delete an user")
 	public ResponseEntity<ResUserDTO> getUserById(@PathVariable("id") long id) throws IdInvalidException {
 		User fetchUser = this.userService.fetchUserById(id);
@@ -95,12 +88,13 @@ public class UserController {
 	@ApiMessage("Update an user")
 	public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody User postmanUser)
 			throws IdInvalidException {
-		User user = this.userService.handleUpdateUser(postmanUser);
-		Company company = this.companyService.fetchCompanyByID(postmanUser.getCompany().getId());
-		if (company == null) {
-			throw new IdInvalidException("Company with ID = " + postmanUser.getCompany().getId() + " does not exist!!!");
-
+		if (postmanUser.getCompany() != null) {
+			Company company = this.companyService.fetchCompanyByID(postmanUser.getCompany().getId());
+			if (company == null) {
+				throw new IdInvalidException("Company with ID = " + postmanUser.getCompany().getId() + " does not exist!!!");
+			}
 		}
+		User user = this.userService.handleUpdateUser(postmanUser);
 		return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(user));
 	}
 

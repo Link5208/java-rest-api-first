@@ -46,9 +46,7 @@ public class RoleController {
 		if (!this.roleService.IsRoleIdExisted(postmanRole.getId())) {
 			throw new IdInvalidException("Role with ID = " + postmanRole.getId() + " does not exist!");
 		}
-		if (this.roleService.IsRoleNameExisted(postmanRole)) {
-			throw new IdInvalidException("Role with name = " + postmanRole.getName() + " existed!");
-		}
+
 		Role updatedRole = this.roleService.handleUpdateRole(postmanRole);
 
 		return ResponseEntity.ok(updatedRole);

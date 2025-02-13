@@ -1,6 +1,5 @@
 package vn.hoidanit.jobhunter.service;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -10,16 +9,13 @@ import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
 import vn.hoidanit.jobhunter.domain.Permission;
-import vn.hoidanit.jobhunter.domain.Role;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.repository.PermissionRepository;
-import vn.hoidanit.jobhunter.repository.RoleRepository;
 
 @Service
 @AllArgsConstructor
 public class PermissionService {
 	private final PermissionRepository permissionRepository;
-	private final RoleRepository roleRepository;
 
 	public boolean checkExistPermission(Permission permission) {
 		return this.permissionRepository.existsByApiPathAndMethodAndModule(

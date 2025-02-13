@@ -18,7 +18,8 @@ public class PermissionService {
 	private final PermissionRepository permissionRepository;
 
 	public boolean checkExistPermission(Permission permission) {
-		return this.permissionRepository.existsByApiPathAndMethodAndModule(
+		return this.permissionRepository.existsByNameAndApiPathAndMethodAndModule(
+				permission.getName(),
 				permission.getApiPath(),
 				permission.getMethod(),
 				permission.getModule());

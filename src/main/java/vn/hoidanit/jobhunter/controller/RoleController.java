@@ -71,4 +71,13 @@ public class RoleController {
 		return ResponseEntity.ok(null);
 	}
 
+	@GetMapping("/roles/{id}")
+	public ResponseEntity<Role> fetchRoleById(@PathVariable("id") long id) throws IdInvalidException {
+		Role role = this.roleService.handleFetchRoleById(id);
+		if (role == null) {
+			throw new IdInvalidException("Role with ID = " + id + " does not exist!");
+		}
+		return ResponseEntity.ok(role);
+	}
+
 }

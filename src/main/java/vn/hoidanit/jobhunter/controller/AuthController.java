@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.request.ReqLoginDTO;
 import vn.hoidanit.jobhunter.domain.response.ResCreateUserDTO;
@@ -30,13 +29,27 @@ import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 @RestController
-@AllArgsConstructor
+
 @RequestMapping("/api/v1")
 public class AuthController {
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
 	private final SecurityUtil securityUtil;
 	private final UserService userService;
 	private final PasswordEncoder passwordEncoder;
+
+	/**
+	 * @param authenticationManagerBuilder
+	 * @param securityUtil
+	 * @param userService
+	 * @param passwordEncoder
+	 */
+	public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil,
+			UserService userService, PasswordEncoder passwordEncoder) {
+		this.authenticationManagerBuilder = authenticationManagerBuilder;
+		this.securityUtil = securityUtil;
+		this.userService = userService;
+		this.passwordEncoder = passwordEncoder;
+	}
 
 	@Value("${hoanglong.jwt.refresh-token-validity-in-seconds}")
 	private long refreshTokenExpiration;
@@ -179,14 +192,14 @@ public class AuthController {
 		}
 		this.userService.updateUserToken(null, email);
 		ResponseCookie deleteCookie = ResponseCookie
-				.from("refresh_token", "")
+				.from("refresh_token", null)
 				.httpOnly(true)
 				.secure(true)
 				.path("/")
 				.maxAge(0)
 				.build();
 		return ResponseEntity
-				.status(HttpStatus.CREATED)
+				.ok()
 				.header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
 				.body(null);
 	}

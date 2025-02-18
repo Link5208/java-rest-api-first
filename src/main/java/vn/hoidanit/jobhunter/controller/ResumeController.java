@@ -68,7 +68,7 @@ public class ResumeController {
 	@ApiMessage("Update a resume")
 	public ResponseEntity<ResUpdateResumeDTO> updateResume(@RequestBody Resume postmanResume)
 			throws IdInvalidException {
-		Resume resume = this.resumeService.fetchResumeByID(postmanResume.getId());
+		Resume resume = this.resumeService.handleFetchResumeByID(postmanResume.getId());
 		if (resume == null) {
 			throw new IdInvalidException("Resume with ID = " + postmanResume.getId() + " does not exist!");
 		}
@@ -93,7 +93,7 @@ public class ResumeController {
 	@GetMapping("/resumes/{id}")
 	@ApiMessage("Fetch a resume by Id")
 	public ResponseEntity<ResResumeDTO> fetchResumeById(@PathVariable("id") long id) throws IdInvalidException {
-		Resume resume = this.resumeService.fetchResumeByID(id);
+		Resume resume = this.resumeService.handleFetchResumeByID(id);
 		if (resume == null) {
 			throw new IdInvalidException("Resume with ID = " + id + " does not exist!");
 		}

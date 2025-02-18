@@ -37,7 +37,7 @@ public class ResumeService {
 		return new ResCreateResumeDTO(resume.getId(), resume.getCreatedAt(), resume.getCreatedBy());
 	}
 
-	public Resume fetchResumeByID(long id) {
+	public Resume handleFetchResumeByID(long id) {
 		Optional<Resume> optional = this.resumeRepository.findById(id);
 		return optional.isPresent() ? optional.get() : null;
 	}

@@ -16,7 +16,6 @@ import vn.hoidanit.jobhunter.repository.UserRepository;
 import vn.hoidanit.jobhunter.util.constant.GenderEnum;
 
 @Service
-
 public class DatabaseInitializer implements CommandLineRunner {
 
 	private final PermissionRepository permissionRepository;

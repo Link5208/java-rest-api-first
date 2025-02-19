@@ -2,9 +2,9 @@ package vn.hoidanit.jobhunter.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import vn.hoidanit.jobhunter.domain.Subscriber;
-import vn.hoidanit.jobhunter.service.SkillService;
 import vn.hoidanit.jobhunter.service.SubscriberService;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @AllArgsConstructor
@@ -23,7 +22,7 @@ public class SubscriberController {
 	private final SubscriberService subscriberService;
 
 	@PostMapping("/subscribers")
-	public ResponseEntity<Subscriber> createSubscriber(@RequestBody Subscriber postmanSubscriber)
+	public ResponseEntity<Subscriber> createSubscriber(@Valid @RequestBody Subscriber postmanSubscriber)
 			throws IdInvalidException {
 		if (this.subscriberService.isSubscriberExistByEmail(postmanSubscriber.getEmail())) {
 			throw new IdInvalidException(("Email " + postmanSubscriber.getEmail() + " has already existed!"));

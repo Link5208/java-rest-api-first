@@ -49,6 +49,7 @@ public class SkillService {
 
 		Skill skill = fetchSkillByID(id);
 		skill.getJobs().forEach(job -> job.getSkills().remove(skill));
+		skill.getSubscribers().forEach(sub -> sub.getSkills().remove(skill));
 		this.skillRepository.delete(skill);
 	}
 }

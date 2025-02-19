@@ -1,12 +1,12 @@
 package vn.hoidanit.jobhunter.service;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -14,8 +14,6 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
-import vn.hoidanit.jobhunter.domain.Job;
-import vn.hoidanit.jobhunter.repository.JobRepository;
 
 @Service
 @AllArgsConstructor
@@ -24,7 +22,6 @@ public class EmailService {
 	private final MailSender mailSender;
 	private final JavaMailSender javaMailSender;
 	private final SpringTemplateEngine springTemplateEngine;
-	private final JobRepository jobRepository;
 
 	public void sendEmail() {
 		SimpleMailMessage message = new SimpleMailMessage();
@@ -50,14 +47,20 @@ public class EmailService {
 
 	}
 
-	public void sendEmailFromTemplateSync(String to, String subject, String templateName) {
+	@Async
+	public void sendEmailFromTemplateSync(
+			String to,
+			String subject,
+			String templateName,
+			String username,
+			Object value) {
 		Context context = new Context();
-		List<Job> jobs = this.jobRepository.findAll();
-		String name = "Long";
-		context.setVariable("name", name);
-		context.setVariable("jobs", jobs);
+
+		context.setVariable("name", username);
+		context.setVariable("jobs", value);
 
 		String content = this.springTemplateEngine.process(templateName, context);
 		this.sendEmailSync(to, subject, content, false, true);
 	}
+
 }

@@ -19,7 +19,7 @@ public class EmailController {
 
 	@GetMapping("/email")
 	@ApiMessage("Sending simple email")
-	@Scheduled(cron = "*/30 * * * * *")
+	// @Scheduled(cron = "*/30 * * * * *")
 	@Transactional
 	public String sendEmail() {
 		// this.emailService.sendEmailSync("hoanglong1292004@gmail.com", "test and

@@ -25,6 +25,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
 	implementation("com.turkraft.springfilter:jpa:3.1.9")
 	implementation("org.springframework.boot:spring-boot-starter-mail")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")

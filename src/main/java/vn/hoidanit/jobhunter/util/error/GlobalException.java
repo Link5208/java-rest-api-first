@@ -73,4 +73,13 @@ public class GlobalException {
 		res.setError("Forbidden!");
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
 	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<RestResponse<Object>> handleAllException(Exception e) {
+		RestResponse<Object> response = new RestResponse<>();
+		response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		response.setMessage(e.getMessage());
+		response.setError("Intermal Server Error");
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	}
 }

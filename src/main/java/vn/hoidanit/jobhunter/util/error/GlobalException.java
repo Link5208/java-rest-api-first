@@ -26,8 +26,8 @@ public class GlobalException {
 	public ResponseEntity<RestResponse<Object>> handleIdException(Exception e) {
 		RestResponse<Object> res = new RestResponse<Object>();
 		res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-		res.setError(e.getMessage());
-		res.setMessage("Exception occurs ...");
+		res.setMessage(e.getMessage());
+		res.setError("Exception occurs ...");
 		return ResponseEntity.badRequest().body(res);
 	}
 
@@ -39,7 +39,7 @@ public class GlobalException {
 
 		RestResponse<Object> res = new RestResponse<>();
 		res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-		res.setError(ex.getBody().getDetail());
+		res.setMessage(ex.getBody().getDetail());
 
 		List<String> errors = fieldErrors.stream().map(f -> f.getDefaultMessage()).collect(Collectors.toList());
 		res.setMessage(errors.size() > 1 ? errors : errors.get(0));
@@ -50,8 +50,8 @@ public class GlobalException {
 	public ResponseEntity<RestResponse<Object>> handleNotFoundException(Exception e) {
 		RestResponse<Object> response = new RestResponse<>();
 		response.setStatusCode(HttpStatus.NOT_FOUND.value());
-		response.setMessage("404 Not Found. URL may not exist...");
-		response.setError(e.getMessage());
+		response.setError("404 Not Found. URL may not exist...");
+		response.setMessage(e.getMessage());
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 	}
@@ -60,8 +60,8 @@ public class GlobalException {
 	public ResponseEntity<RestResponse<Object>> handleFileUploadException(Exception e) {
 		RestResponse<Object> res = new RestResponse<Object>();
 		res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-		res.setError(e.getMessage());
-		res.setMessage("Upload-file exception occurs ...");
+		res.setMessage(e.getMessage());
+		res.setError("Upload-file exception occurs ...");
 		return ResponseEntity.badRequest().body(res);
 	}
 
@@ -69,8 +69,8 @@ public class GlobalException {
 	public ResponseEntity<RestResponse<Object>> handlePermissionException(Exception e) {
 		RestResponse<Object> res = new RestResponse<Object>();
 		res.setStatusCode(HttpStatus.FORBIDDEN.value());
-		res.setError(e.getMessage());
-		res.setMessage("Forbidden!");
+		res.setMessage(e.getMessage());
+		res.setError("Forbidden!");
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
 	}
 }

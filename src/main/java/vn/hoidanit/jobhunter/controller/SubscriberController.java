@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import vn.hoidanit.jobhunter.domain.Subscriber;
 import vn.hoidanit.jobhunter.service.SubscriberService;
+import vn.hoidanit.jobhunter.util.SecurityUtil;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 import org.springframework.http.HttpStatus;
@@ -41,6 +42,14 @@ public class SubscriberController {
 		}
 
 		return ResponseEntity.ok(this.subscriberService.handleUpdateSubscriber(postmanSubscriber));
+	}
+
+	@PostMapping("/subscribers/skills")
+	public ResponseEntity<Subscriber> getSubscribersSkill() {
+		String email = SecurityUtil.getCurrentUserLogin().isPresent()
+				? SecurityUtil.getCurrentUserLogin().get()
+				: "";
+		return ResponseEntity.ok(this.subscriberService.handleFindByEmail(email));
 	}
 
 }
